@@ -1,0 +1,12 @@
+{% extends 'chat/base.html' %} 
+{% block body %}
+    <div class="flex flex-col justify-center items-center min-h-screen">
+        <h1 class="mb-5">Are you sure you want to join {{ chatroom.name }} room?</h1>
+        <form action="{% url 'join_request' chatroom.uniqe_key %}" method="post">
+            {% csrf_token %}
+            <button class="bg-green-500 text-white px-4 py-2">Send request</button>
+            <a class="bg-red-500 text-white px-6 py-3" href="{% url 'index' %}">No</a>
+        </form>
+
+    </div>
+{% endblock %}

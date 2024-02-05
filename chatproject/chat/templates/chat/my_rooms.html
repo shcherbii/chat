@@ -1,0 +1,27 @@
+{% extends 'chat/base.html' %}
+{% block body %}
+<h1 class="font-bold m-10">List of rooms</h1>
+
+{% for chatroom in chatrooms %}
+    <div class="shadow-lg p-10 m-10 bg-blue-900 text-white rounded-lg">
+        <div class="grid grid-cols-2">
+            <div class="flex  items-center">
+                <a href="{% url 'chat_room' chatroom.uniqe_key %}">
+                    {% if chatroom.type.type == 'private' %}
+                        <i class="fa-solid fa-lock"></i> 
+                    {% else %}
+                        <i class="fa-solid fa-lock-open"></i>
+                    {% endif %}
+        
+                    {{ chatroom.name }}
+                </a> 
+            </div>
+            <div class="flex justify-end items-center">
+                <a class="bg-red-500 text-white px-4 py-2 rounded-sm" style="float:right; " href="{% url 'delete_room' chatroom.uniqe_key %}">Delete</a>
+            </div>
+
+        </div>
+    </div>
+    
+{% endfor %}
+{% endblock %}
