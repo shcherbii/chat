@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  chatproject:
+  app:
     build:
       context: .
     restart: always
@@ -32,9 +32,9 @@ services:
       context: ./proxy
     restart: always
     depends_on:
-      - chatproject
+      - app
     ports:
-      - 81:8001
+      - 81:8000
     volumes:
       - static-data:/vol/static
 

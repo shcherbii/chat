@@ -7,7 +7,7 @@ services:
       args:
         - DEV=true
     ports:
-      - '8000:8000'
+      - '81:8000'
     volumes:
       - ./chatproject:/chatproject
       - dev-static-data:/vol/web
