@@ -34,7 +34,7 @@ services:
     depends_on:
       - chatproject
     ports:
-      - 80:8000
+      - 81:8001
     volumes:
       - static-data:/vol/static
 
