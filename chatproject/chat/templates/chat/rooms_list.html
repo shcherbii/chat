@@ -1,0 +1,177 @@
+<div class="flex flex-col ">
+    <div class="flex flex-row items-center justify-between text-xs">
+      <span class="font-bold">Groups</span>
+      <a href="{% url 'create_room' %}"
+      class="px-3.5 py-3 font-sans text-xs font-bold text-center text-gray-900 uppercase align-middle transition-all rounded-full select-none hover:bg-gray-900/10 active:bg-gray-900/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+      type="button"
+    >
+    <i class="fa-solid fa-plus"></i>
+    </a>
+      <span
+        class="flex items-center justify-center bg-gray-300 h-4 w-4 rounded-full"
+        >{{group_chat|length}}</span
+      >
+    </div>
+
+    
+      <div class="flex flex-col space-y-1 mt-4 -mx-2 max-h-32 overflow-y-auto">
+          {% for chatroom in group_chat %}
+                
+                <a class="flex flex-row items-center hover:bg-gray-100 rounded-xl p-2" href="{% url 'chat_room' chatroom.chat_id %}">
+                    <div
+                        class="flex items-center justify-center h-8 w-8 bg-gray-200 rounded-full"
+                        >
+                        {% if chatroom.photo %}
+                        <img src="{{ chatroom.photo.url }}" alt="" class="rounded-full h-13 w-14">
+
+                        {% else %}
+                        {{chatroom.name|make_list|first|title}}
+
+                        {% endif %}
+                        </div>
+                        <div class="ml-2 text-sm font-semibold">{{ chatroom.name }}</div>
+
+                        <div
+                        class="flex items-center justify-center ml-auto text-xs text-white bg-red-500 h-4 w-4 rounded leading-none"
+                        id="{{chatroom.chat_id}}" >
+                        {% for room_notification in rooms_notification %}
+                            {% if chatroom == room_notification.chat %}
+                                    {{ room_notification.count_massages }}
+                            {% endif %}
+                        {% endfor %}
+                        </div>
+     
+                    </a>
+              
+          {% endfor %}
+      
+    </div>
+    {% if personal_chat %}
+        <div class="flex flex-row items-center justify-between text-xs mt-6">
+          <span class="font-bold">Personal</span>
+
+          <span
+            class="flex items-center justify-center bg-gray-300 h-4 w-4 rounded-full"
+            >{{personal_chat|length}}</span
+          >
+        </div>
+        <div class="flex flex-col space-y-1 mt-4 -mx-2 h-32 overflow-y-auto">
+              {% for chatroom in personal_chat %}
+                        
+                <a class="flex flex-row items-center hover:bg-gray-100 rounded-xl p-2" href="{% url 'chat_room' chatroom.chat_id %}">
+                    <div
+                        class="flex items-center justify-center h-8 w-8 bg-gray-200 rounded-full"
+                        >
+                        {% for chatusers in chatroom.chatusers_set.all %}
+                          {% if chatusers.user != user %}
+                          <img src="{{ chatusers.user.profile.photo.url }}" alt="" class="rounded-full h-13 w-14">
+                          <!-- {{chatusers.user|make_list|first|title}} -->
+                          </div>
+                            <div class="ml-2 text-sm font-semibold">{{ chatusers.user }}</div>   
+                            {% endif %}
+                        {% endfor %}
+
+                        <div
+                        class="flex items-center justify-center ml-auto text-xs text-white bg-red-500 h-4 w-4 rounded leading-none"
+                        id="{{chatroom.chat_id}}" >
+                        {% for room_notification in rooms_notification %}
+                            {% if chatroom == room_notification.chat %}
+                                    {{ room_notification.count_massages }}
+                            {% endif %}
+                        {% endfor %}
+                        </div>
+                    </a>
+              {% endfor %}
+            </div>
+     {% else %}
+      <div class="flex flex-row items-center justify-between text-xs mt-6">
+        <span class="font-bold">Find users</span>
+
+        <span
+          class="flex items-center justify-center bg-gray-300 h-4 w-4 rounded-full"
+          >{{findusers|length}}</span
+        >
+      </div>
+      <div class="flex flex-col space-y-1 mt-4 -mx-2 h-32 overflow-y-auto">
+          {% for finduser in findusers %}
+            <a class="flex flex-row items-center hover:bg-gray-100 rounded-xl p-2" href="{% url 'personal_chat_room' finduser.username %}">
+              <div
+                  class="flex items-center justify-center h-8 w-8 bg-gray-200 rounded-full"
+                  >
+
+                    <img src="{{ finduser.profile.photo.url }}" alt="" class="rounded-full h-13 w-14">
+                    <!-- {{chatusers.user|make_list|first|title}} -->
+                    </div>
+                      <div class="ml-2 text-sm font-semibold">{{ finduser.username }}</div>   
+            </a>
+          {% endfor %}
+      </div>
+      {% endif %}
+    
+
+<!-- {{ user.username|json_script:"json-username" }} -->
+
+  </div>
+
+  <script>
+    // setup chat scoket
+
+    // const username = JSON.parse(document.getElementById('json-username').textContent)
+
+    // console.log(username)
+    const notifyScoket = new WebSocket(
+           'ws://'
+           + window.location.host
+           + '/ws/'
+       );
+   
+       // on socket open
+       notifyScoket.onopen = function (e) {
+           console.log('Socket successfully connected.');
+       };
+   
+       // on socket close
+       notifyScoket.onclose = function (e) {
+           console.log('Socket closed unexpectedly');
+       };
+   
+       // on receiving message on group
+       notifyScoket.onmessage = function (e) {
+           const data = JSON.parse(e.data);
+           const message = data.count_massages;
+          //  console.log('sdvds', data.count_massages)
+          //  console.log('sdvds', data.massages_room)
+
+           
+           document.getElementById(data.massages_room).innerHTML = data.count_massages
+           console.log(count) 
+           // Call the setMessage function to add the new li element
+           // setMessage(message);
+   
+       };
+   
+       function setMessage(message) {
+           // Create a new li element
+           // var newLi = document.createElement('li');
+   
+           // // Create a new anchor element
+           // var newAnchor = document.createElement('a');
+           // newAnchor.className = 'dropdown-item text-wrap';
+           // newAnchor.href = '#';
+           // newAnchor.textContent = message;
+   
+           // // Append the anchor element to the li element
+           // newLi.appendChild(newAnchor);
+   
+           // // Get the ul element with the id "notify"
+           // var ulElement = document.getElementById('notify');
+   
+           // // Append the new li element to the ul element
+           // ulElement.appendChild(newLi);
+   
+           // // getting object of count
+           // count = document.getElementById('bellCount').getAttribute('data-count');
+           // document.getElementById('bellCount').setAttribute('data-count', parseInt(count) + 1);
+       }
+   
+   </script>

@@ -1,0 +1,157 @@
+{% extends 'chat/base.html' %}
+
+{% block body %}
+<div class="flex flex-col flex-auto p-6 my-5 " >
+    <div
+        class="flex flex-col flex-auto items-center flex-shrink-0 rounded-2xl  h-full p-4  "
+    >
+    <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+        <div href="" class="flex flex-row items-center justify-center h-12 w-full">
+              
+            <div
+              class="flex items-center justify-center rounded-2xl text-indigo-700 bg-indigo-100 h-10 w-10"
+            >
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                ></path>
+              </svg>
+            </div>
+            <div class="ml-2 font-bold text-2xl">{{ chatroom.name }}   
+                {% if user_type == 'creator'%}
+                <a href="{% url 'edit_chat' chatroom.chat_id %}"><i class="fa-solid fa-pencil"></i>
+                </a>
+                <a href="{% url 'delete_chat' chatroom.chat_id %}"><i class="fa-solid fa-trash"></i>
+                </a>
+                {% endif %}
+            </div>
+          </div>
+        <h2 class="mt-5 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900"></h2>
+    </div>
+
+    <div class="space-y-12">
+        <div class="border-b border-gray-900/10 pb-12">
+        <h2 class="text-base font-semibold leading-7 text-gray-900">Chat users</h2>
+        {% for room_user in active_users %}
+
+            <ul role="list" class="divide-y divide-gray-100">
+                <li class="flex justify-between gap-x-6 py-5">
+                <a class="flex min-w-0 gap-x-4" href="{% url 'profile' room_user.user.username %}">
+                    <img class="h-12 w-12 flex-none rounded-full bg-gray-50" src="{{room_user.user.profile.photo.url}}" alt="">
+                    <div class="min-w-0 flex-auto">
+                    <p class="text-sm font-semibold leading-6 text-gray-900">{{room_user.user.username}}</p>
+                    <p class="mt-1 truncate text-xs leading-5 text-gray-500">{{room_user.user.email}}</p>
+                    </div>
+                </a>
+                <div>
+                    {% if user_type == 'creator' %}
+                        {% if room_user.user != request.user %}
+                        <form action="{% url 'block_user' chatroom.chat_id room_user.user.id %}" method="post" class="grid grid-cols-2 gap-1">
+                            {% csrf_token %}
+                            <button type="submit" value="accept" name="status" >
+                                <i class="fa-solid fa-lock" style="color: #ff0000;"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                    {% elif user_type == 'admin' and room_user.user != request.user and room_user.user.type.type != 'admin' and room_user.user.type.type != 'creator'%}
+                        <form action="{% url 'block_user' chatroom.chat_id room_user.user.id %}" method="post" class="grid grid-cols-2 gap-1">
+                            {% csrf_token %}
+                            <button type="submit" value="accept" name="status" >
+                                <i class="fa-solid fa-lock" style="color: #ff0000;"></i>
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+                <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                    <p class="text-sm leading-6 text-gray-900">{{ room_user.type }}</p>
+
+                    <p class="text-sm leading-6 text-gray-900">{{ room_user.status }}</p>
+
+            
+
+                    <!-- <p class="mt-1 text-xs leading-5 text-gray-500">Last seen <time datetime="2023-01-23T13:23Z">3h ago</time></p> -->
+                </div>
+
+
+            </ul>
+        {% endfor %}
+        {% if user_type == 'admin' or user_type == 'creator' %}
+            <h2 class="text-base font-semibold leading-7 text-gray-900">Blocked users: {{ blocked_users.count }}</h2> 
+            {% for room_user in blocked_users %}
+
+                <ul role="list" class="divide-y divide-gray-100">
+                    <li class="flex justify-between gap-x-6 py-5">
+                    <a class="flex min-w-0 gap-x-4" href="{% url 'profile' room_user.user.username %}">
+                        <img class="h-12 w-12 flex-none rounded-full bg-gray-50" src="{{room_user.user.profile.photo.url}}" alt="">
+                        <div class="min-w-0 flex-auto">
+                        <p class="text-sm font-semibold leading-6 text-gray-900">{{room_user.user.username}}</p>
+                        <p class="mt-1 truncate text-xs leading-5 text-gray-500">{{room_user.user.email}}</p>
+                        </div>
+                    </a>
+                    <div>
+                        {% if user_type == 'creator' %}
+                            {% if room_user.user != request.user %}
+                            <form action="{% url 'unblock_user' chatroom.chat_id room_user.user.id %}" method="post" class="grid grid-cols-2 gap-1">
+                                {% csrf_token %}
+                                <button type="submit" value="accept" name="status" >
+                                    <i class="fa-solid fa-unlock" style="color: #63E6BE;"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        {% elif user_type == 'admin' and room_user.user != request.user and room_user.user.type.type != 'admin' and room_user.user.type.type != 'creator'%}
+                            <form action="{% url 'unblock_user' chatroom.chat_id room_user.user.id %}" method="post" class="grid grid-cols-2 gap-1">
+                                {% csrf_token %}
+                                <button type="submit" value="accept" name="status" >
+                                    <i class="fa-solid fa-unlock" style="color: #63E6BE;"></i>
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                    <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                        <p class="text-sm leading-6 text-gray-900">{{ room_user.type }}</p>
+                        <p class="text-sm leading-6 text-gray-900">{{ room_user.status }}</p>
+                        <!-- <p class="mt-1 text-xs leading-5 text-gray-500">Last seen <time datetime="2023-01-23T13:23Z">3h ago</time></p> -->
+                    </div>
+
+
+                </ul>
+            {% endfor %}
+        {% endif %}
+        {% if user_type == 'admin' or user_type == 'creator' and users_requests %}
+            <h2 class="text-base font-semibold leading-7 text-gray-900">Users request: {{ users_requests.count }}</h2>  
+            {% for users_request in users_requests %}
+            <ul role="list" class="divide-y divide-gray-100">
+                <li class="flex justify-between gap-x-6 py-5">
+                <a class="flex min-w-0 gap-x-4" href="{% url 'profile' users_request.user.username %}">
+                    <img class="h-12 w-12 flex-none rounded-full bg-gray-50" src="{{users_request.user.profile.photo.url}}" alt="">
+                    <div class="min-w-0 flex-auto">
+                    <p class="text-sm font-semibold leading-6 text-gray-900">{{users_request.user.username}}</p>
+                    <p class="mt-1 truncate text-xs leading-5 text-gray-500">{{users_request.user.email}}</p>
+                    </div>
+                </a>
+                <form action="{% url 'handle_join_request' users_request.chat.chat_id users_request.user.id %}" method="post" class="grid grid-cols-2 gap-1">
+                    {% csrf_token %}
+                    <button type="submit" value="accept" name="status" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                        <i class="fa-solid fa-check" ></i>
+                    </button>
+                    <button type="submit" value="reject" name="status" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </form>
+            </ul>
+            {% endfor %}
+        {% endif %}
+        
+        </div>
+
+    </div>
+{% endblock %}

@@ -1,8 +1,8 @@
 from django import forms
-from .models import ChatRoom
+from .models import Chat
 
-class RoomCreateForm(forms.ModelForm):
+class ChatForm(forms.ModelForm):
 
     class Meta:
-        model = ChatRoom
-        fields = ('name', 'type')
+        model = Chat
+        fields = {'name', 'is_private', 'photo'}

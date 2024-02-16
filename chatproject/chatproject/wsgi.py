@@ -10,7 +10,17 @@ https://docs.djangoproject.com/en/4.2/howto/deployment/wsgi/
 import os
 
 from django.core.wsgi import get_wsgi_application
+from channels.auth import AuthMiddlewareStack
+from channels.routing import ProtocolTypeRouter, URLRouter
+import chat.routing 
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chatproject.settings')
 
-application = get_wsgi_application()
+application = ProtocolTypeRouter({
+        'http':get_wsgi_application(),
+        'websocket':AuthMiddlewareStack(
+            URLRouter(
+                chat.routing.websocket_urlpatterns
+            )
+        )  
+})

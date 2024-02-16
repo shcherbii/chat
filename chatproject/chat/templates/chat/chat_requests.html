@@ -1,0 +1,79 @@
+
+{% if users_requests %}
+    <span class="text-sm text-white p-1" > </span>
+
+    <h2 class="text-base font-semibold leading-7 text-gray-900">Users request: {{ users_requests.count }}</h2>
+    {% for users_request in users_requests %}
+        <ul role="list" class="divide-y divide-gray-100">
+            <li class="flex justify-between gap-x-6 py-5">
+            <a class="flex min-w-0 gap-x-4" href="{% url 'profile' room_user.user.username %}">
+                <img class="h-12 w-12 flex-none rounded-full bg-gray-50" src="{{room_user.user.profile.photo.url}}" alt="">
+                <div class="min-w-0 flex-auto">
+                <p class="text-sm font-semibold leading-6 text-gray-900">{{room_user.user.username}}</p>
+                <p class="mt-1 truncate text-xs leading-5 text-gray-500">{{room_user.user.email}}</p>
+                </div>
+            </a>
+            <form action="{% url 'handle_join_request' users_request.room.uniqe_key users_request.user.id %}" method="post" class="grid grid-cols-2 gap-1">
+                {% csrf_token %}
+                <button type="submit" value="accept" name="status" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    <i class="fa-solid fa-check" ></i>
+                </button>
+                <button type="submit" value="reject" name="status" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </form>
+        </ul>
+    {% endfor %}
+
+{% endif %}
+<!-- 
+<div class="relative ml-auto">
+    <div class="absolute left-0 top-0  bg-red-500 rounded-full" style="top: -10px; left:-5px;">
+        {% if users_requests %}
+        <span class="text-sm text-white p-1" >{{ users_requests.count }} </span>
+        {% endif %}
+     </div>
+    <div x-data="{ dropdownOpen: false }" >
+        <button @click="dropdownOpen = !dropdownOpen" class="z-10 block rounded-md bg-white p-2 focus:outline-none">
+            <svg class="h-5 w-5 text-gray-800" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+            </svg>
+        </button>
+
+        <div x-show="dropdownOpen" @click="dropdownOpen = false" class="fixed inset-0 h-full w-full z-10"></div>
+
+        <div x-show="dropdownOpen" class="absolute right-0 mt-2 bg-white rounded-md shadow-lg overflow-hidden z-20" style="width:22rem;">
+            <div class="py-2">
+                {% if users_requests %}
+                {% for users_request in users_requests %}
+                <a href="#" class="flex items-center px-4 py-3 border-b hover:bg-gray-100 -mx-2">
+                    <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M12.432 0c1.34 0 2.01.912 2.01 1.957 0 1.305-1.164 2.512-2.679 2.512-1.269 0-2.009-.75-1.974-1.99C9.789 1.436 10.67 0 12.432 0zM8.309 20c-1.058 0-1.833-.652-1.093-3.524l1.214-5.092c.211-.814.246-1.141 0-1.141-.317 0-1.689.562-2.502 1.117l-.528-.88c2.572-2.186 5.531-3.467 6.801-3.467 1.057 0 1.233 1.273.705 3.23l-1.391 5.352c-.246.945-.141 1.271.106 1.271.317 0 1.357-.392 2.379-1.207l.6.814C12.098 19.02 9.365 20 8.309 20z"/></svg>
+                    <p class="text-gray-600 text-sm mx-2">
+                        <span class="font-bold" href="#">{{users_request.user.username}}</span> send request to join<span class="font-bold text-blue-500" href="#"> {{users_request.room.name}}</span> room. <br>{{users_request.date}}
+                    </p>
+                    <form action="{% url 'handle_join_request' users_request.room.uniqe_key users_request.user.id %}" method="post" class="grid grid-cols-2 gap-1">
+                        {% csrf_token %}
+                        <button type="submit" value="accept" name="status" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            <i class="fa-solid fa-check" ></i>
+                        </button>
+                        <button type="submit" value="reject" name="status" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </form>
+
+                </a>
+
+                {% endfor %}
+                {% else %}
+                <a href="#" class="flex items-center px-4 py-3 border-b hover:bg-gray-100 -mx-2">
+                    <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M12.432 0c1.34 0 2.01.912 2.01 1.957 0 1.305-1.164 2.512-2.679 2.512-1.269 0-2.009-.75-1.974-1.99C9.789 1.436 10.67 0 12.432 0zM8.309 20c-1.058 0-1.833-.652-1.093-3.524l1.214-5.092c.211-.814.246-1.141 0-1.141-.317 0-1.689.562-2.502 1.117l-.528-.88c2.572-2.186 5.531-3.467 6.801-3.467 1.057 0 1.233 1.273.705 3.23l-1.391 5.352c-.246.945-.141 1.271.106 1.271.317 0 1.357-.392 2.379-1.207l.6.814C12.098 19.02 9.365 20 8.309 20z"/></svg>
+                    <p class="text-gray-600 text-sm mx-2">
+                        <span class="font-bold" href="#">Notifications box is empty</span> 
+                    </p>
+                </a>
+                {% endif %}
+            </div>
+            <!-- <a href="#" class="block bg-gray-800 text-white text-center font-bold py-2">See all notifications</a> -->
+        </div>
+    </div>
+</div> -->

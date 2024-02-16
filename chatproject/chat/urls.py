@@ -4,12 +4,15 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('my/', views.get_user_rooms, name='my_rooms'),
     path('create/', views.create_room, name='create_room'),
-    path('room_users/<str:uniqe_key>/', views.room_users_list, name='room_users'),
-    path('join_room/<str:uniqe_key>/', views.send_join_request, name='join_request'),
-    path('join_room/<str:uniqe_key>/<int:user_id>', views.handle_join_request, name='handle_join_request'),
-    path('delete/<str:uniqe_key>/', views.delete_room, name='delete_room'),
+    path('<str:chat_id>/info', views.chat_info, name='chat_info'),
+    path('join_room/<str:chat_id>/', views.send_join_request, name='join_request'),
+    path('<str:chat_id>/edit', views.edit_chat, name='edit_chat'),
+    path('join_room/<str:chat_id>/<int:user_id>', views.handle_join_request, name='handle_join_request'),
+    path('<str:chat_id>/<int:user_id>/block', views.block_user, name='block_user'),
+    path('<str:chat_id>/<int:user_id>/unblock', views.unblock_user, name='unblock_user'),
+    path('delete/<str:chat_id>/', views.delete_chat, name='delete_chat'),
     path('invalid/', views.invalid, name='invalid'),
-    path('<str:uniqe_key>/', views.chat_room, name='chat_room'),
+    path('<str:chat_id>/', views.chat_room, name='chat_room'),
+    path('personal/<str:username>/', views.personal_chat_room, name='personal_chat_room'),
 ]
